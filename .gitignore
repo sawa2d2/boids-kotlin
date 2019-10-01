@@ -1,0 +1,27 @@
+.vscode
+bin/
+out/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+target
+!.mvn/wrapper/maven-wrapper.jar
+
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.metadata
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
