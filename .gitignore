@@ -2,7 +2,7 @@
 bin/
 out/
 
-# Javaj
+# Java
 *.class
 *.jar
 *.war
