@@ -33,6 +33,7 @@ dependencies {
 
     implementation("org.processing:core:3.3.7")
     implementation("org.nd4j:nd4j-native-platform:0.9.1")
+    implementation("org.slf4j:slf4j-log4j12:1.7.28")
 }
 
 application {

@@ -3,7 +3,7 @@ import boids.*
 
 class Main : PApplet () {
     var d = 8F // diameter
-    var model = Boids(N = 500)
+    var model = Boids(N = 50)
 
     override fun settings() {
         size(600, 600)
