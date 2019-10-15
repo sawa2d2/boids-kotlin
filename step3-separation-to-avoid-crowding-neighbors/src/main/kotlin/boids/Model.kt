@@ -4,32 +4,41 @@ import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 
 class Model(var N: Int) {
-    val rangeMin = Nd4j.create(doubleArrayOf(0.0, 0.0))
-    val rangeMax = Nd4j.create(doubleArrayOf(600.0, 600.0))
-
+    val rangeMin = doubleArrayOf(0.0, 0.0)
+    val rangeMax = doubleArrayOf(600.0, 600.0)
     val boids = Array(N, {
         Boid(
             p = Nd4j.rand(1, 2).mul(600.0),
-            v = Nd4j.rand(1, 2).sub(0.5).mul(5 * 2.0),
+            v = Nd4j.rand(1, 2).sub(0.5).muli(5 * 2.0),
             rangeMin = rangeMin,
             rangeMax = rangeMax
         )
     })
 
     fun run() {
+        //observation phase
+        for(boid in boids) {
+            boid.observe(boids)
+        }
+        
         var pAve = Nd4j.zeros(2)
         var vAve = Nd4j.zeros(2)
 
-        for(i in boids) {
-            pAve = pAve.add(i.p)
-            vAve = vAve.add(i.v)
+        for(boid in boids) {
+            pAve.addi(boid.p)
+            vAve.addi(boid.v)
         }
-        pAve = pAve.div(boids.size)
-        vAve = vAve.div(boids.size)
+        pAve.divi(boids.size)
+        vAve.divi(boids.size)
 
+        //decision phase
+        for(boid in boids) {
+            boid.decide(pAve = pAve, vAve = vAve)
+        }
 
-        for(i in boids) {
-            i.run(pAve = pAve, vAve = vAve, neighbors = boids)
+        //action phase
+        for(boid in boids) {
+            boid.act()
         }
     }
 

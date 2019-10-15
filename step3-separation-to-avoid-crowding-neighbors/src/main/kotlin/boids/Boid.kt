@@ -3,47 +3,63 @@ package boids
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 
-class Boid(var p: INDArray, var v: INDArray, val rangeMin: INDArray, val rangeMax: INDArray) {
+class Boid(
+        var p: INDArray,
+        var v: INDArray,
+        val rangeMin: DoubleArray,
+        val rangeMax: DoubleArray
+    ) {
     var neighbors = arrayOf(this)
+    var vNext = Nd4j.zeros(2);
     val cCoh = 0.1
     val cAlg = 0.5
     val cSep = 0.1
 
-    fun run(pAve: INDArray, vAve: INDArray, neighbors: Array<Boid>) {
+    fun observe(boids: Array<Boid>) {
+        neighbors = boids
+    }
+
+    fun decide(pAve: INDArray, vAve: INDArray) {
         val aCoh = pAve.sub(p)
         val aAlg = vAve.sub(v)
-        var aSep = Nd4j.create(doubleArrayOf(0.0, 0.0))
+        var aSep = Nd4j.zeros(2)
     
-        for(j in neighbors) {
-            if(j == this){
-                continue
+        for(neighbor in neighbors) {
+            if(neighbor != this){
+                val u = p.sub(neighbor.p)
+                val d = u.norm2Number()
+                aSep.addi(u.div(d))
+                //println(e)
             }
-            val u = p.sub(j.p)
-            val d = u.norm2Number()
-            aSep = aSep.add(u.div(d))
-            //println(e)
         }
 
-        v = v.add(aCoh.mul(cCoh))
-        v = v.add(aAlg.mul(cAlg))
-        v = v.add(aSep.mul(cSep))
 
+        val a = Nd4j.zeros(2)
+        a.addi(aCoh.mul(cCoh))
+        a.addi(aAlg.mul(cAlg))
+        a.addi(aSep.mul(cSep))
+        
+        val vNext = v.add(a)
+        
         val vMax: Number = 5.0
         val vNorm = v.norm2Number()
-        v = v.div(vNorm).mul(vMax)
+        this.vNext = vNext.div(vNorm).mul(vMax)
+    }
 
-        p = p.add(v)
+    fun act() {
+        v = vNext
+        p = p.add(vNext)
         fix()
     }
 
-    fun fix() {
+    private fun fix() {
         for(d in 0..1) {
-            if(p.getDouble(d) <= rangeMin.getDouble(d)) {
-               p.putScalar(d, rangeMin.getDouble(d))
+            if(p.getDouble(d) <= rangeMin[d]) {
+               p.putScalar(d, rangeMin[d])
                v.putScalar(d, -v.getDouble(d))
             }
-            if(p.getDouble(d) >= rangeMax.getDouble(d)) {
-               p.putScalar(d, rangeMax.getDouble(d))
+            if(p.getDouble(d) >= rangeMax[d]) {
+               p.putScalar(d, rangeMax[d])
                v.putScalar(d, -v.getDouble(d))
             }
         }
