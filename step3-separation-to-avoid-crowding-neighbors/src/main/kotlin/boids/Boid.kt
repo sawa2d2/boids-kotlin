@@ -39,11 +39,6 @@ public class Boid(
             }
         }
 
-        /*
-        aCoh = aCoh.mapMultiply(cCoh)
-        aAlg = aAlg.mapMultiply(cAlg)
-        aSep = aSep.mapMultiply(cSep)
-        */
         aCoh = aCoh.mapMultiply(cCoh)
         aAlg = aAlg.mapMultiply(cAlg)
         aSep.mapMultiplyToSelf(cSep)
@@ -65,7 +60,7 @@ public class Boid(
         fixP(p)
     }
 
-    private fun fixV(v: RealVector, vMax: Double) = v.mapMultiplyToSelf(min(vMax/v.getNorm(), 1.0))
+    //private fun fixV(v: RealVector, vMax: Double) = v.mapMultiplyToSelf(min(vMax/v.getNorm(), 1.0))
     
     private fun fixP(p: RealVector) {
         for(d in 0..1) {

@@ -8,7 +8,7 @@ import org.apache.commons.math3.linear.ArrayRealVector
 class Model(var N: Int) {
     val rangeMin = doubleArrayOf(0.0, 0.0)
     val rangeMax = doubleArrayOf(600.0, 600.0)
-    val vMax = 5.0
+    val vMax = 2.5
     val boids = Array(N, {
         Boid(
             p = ArrayRealVector(doubleArrayOf(Random.nextDouble(600.0), Random.nextDouble(600.0))),
