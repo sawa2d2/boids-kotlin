@@ -13,7 +13,7 @@ class Boid(
     var vNext = Nd4j.zeros(2);
     val cCoh = 0.1
     val cAlg = 0.5
-    val cSep = 0.1
+    val cSep = 0.00045
 
     fun observe(boids: Array<Boid>) {
         neighbors = boids
@@ -27,23 +27,23 @@ class Boid(
         for(neighbor in neighbors) {
             if(neighbor != this){
                 val u = p.sub(neighbor.p)
-                val d = u.norm2Number()
-                aSep.addi(u.div(d))
+                //val d = u.norm2Number()
+                aSep.addi(u/*.div(d)*/)
                 //println(e)
             }
         }
 
-
-        val a = Nd4j.zeros(2)
-        a.addi(aCoh.mul(cCoh))
-        a.addi(aAlg.mul(cAlg))
-        a.addi(aSep.mul(cSep))
+        var a = Nd4j.zeros(2)
+        a.add(aCoh.mul(cCoh))
+        a.add(aAlg.mul(cAlg))
+        a.add(aSep.mul(cSep))
         
         val vNext = v.add(a)
-        
+
+        //constriction the velocity
         val vMax: Number = 5.0
-        val vNorm = v.norm2Number()
-        this.vNext = vNext.div(vNorm).mul(vMax)
+        //val vNorm = v.norm2Number()
+        this.vNext = vNext//.div(vNorm).mul(vMax)
     }
 
     fun act() {

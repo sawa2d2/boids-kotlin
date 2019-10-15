@@ -14,6 +14,9 @@ class Model(var N: Int) {
             rangeMax = rangeMax
         )
     })
+    init{
+        Nd4j.getRandom().setSeed(0) //setting of random seed
+    }
 
     fun run() {
         //observation phase
