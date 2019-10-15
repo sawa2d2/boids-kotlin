@@ -30,6 +30,10 @@ public class Boid(
             if(neighbor != this){
                 val dir = p.subtract(neighbor.p)
                 val nrm = dir.getNorm()
+                if(nrm == 0.0) {
+                    println("!!")
+                    continue
+                }
                 val sep = dir.unitVector().mapDivide(nrm)
                 aSep = aSep.add(sep)
             }
@@ -48,9 +52,10 @@ public class Boid(
         a = a.add(aAlg)
         a = a.add(aSep)
 
-        val vMax = 2.0
         var vNext = a.add(v)
-        fixV(vNext, vMax)
+        //fixV(vNext, vMax)
+        //vNext.mapMultiplyToSelf(min((vMax/vNext.getNorm()), 1.0))
+        vNext.mapMultiplyToSelf(vMax/(if(vNext.getNorm() != 0.0) vNext.getNorm() else 1.0))
         this.vNext = vNext
     }
 
