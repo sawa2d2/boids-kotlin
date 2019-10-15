@@ -1,22 +1,26 @@
 package boids
 
-import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.factory.Nd4j
+import kotlin.math.*
+import kotlin.random.*
+import org.apache.commons.math3.linear.RealVector
+import org.apache.commons.math3.linear.ArrayRealVector
 
 class Model(var N: Int) {
     val rangeMin = doubleArrayOf(0.0, 0.0)
     val rangeMax = doubleArrayOf(600.0, 600.0)
+    val vMax = 5.0
     val boids = Array(N, {
         Boid(
-            p = Nd4j.rand(1, 2).mul(600.0),
-            v = Nd4j.rand(1, 2).sub(0.5).muli(5 * 2.0),
+            p = ArrayRealVector(doubleArrayOf(Random.nextDouble(600.0), Random.nextDouble(600.0))),
+            v = ArrayRealVector(doubleArrayOf(Random.nextDouble(2 * vMax) - vMax, Random.nextDouble(2 * vMax) - vMax)),
             rangeMin = rangeMin,
-            rangeMax = rangeMax
+            rangeMax = rangeMax,
+            vMax = vMax,
+            cCoh = 0.1,
+            cAlg = 0.5,
+            cSep = 5.0
         )
     })
-    init{
-        Nd4j.getRandom().setSeed(0) //setting of random seed
-    }
 
     fun run() {
         //observation phase
@@ -24,15 +28,15 @@ class Model(var N: Int) {
             boid.observe(boids)
         }
         
-        var pAve = Nd4j.zeros(2)
-        var vAve = Nd4j.zeros(2)
+        var pAve = ArrayRealVector(2)
+        var vAve = ArrayRealVector(2)
 
         for(boid in boids) {
-            pAve.addi(boid.p)
-            vAve.addi(boid.v)
+            pAve = pAve.add(boid.p)
+            pAve = pAve.add(boid.v)
         }
-        pAve.divi(boids.size)
-        vAve.divi(boids.size)
+        pAve.mapDivideToSelf(boids.size.toDouble())
+        vAve.mapDivideToSelf(boids.size.toDouble())
 
         //decision phase
         for(boid in boids) {
@@ -47,7 +51,10 @@ class Model(var N: Int) {
 
     fun getData(): Array<FloatArray> {
         return Array<FloatArray>(boids.size, {
-            floatArrayOf(boids[it].p.getFloat(0), boids[it].p.getFloat(1))
+            floatArrayOf(
+                boids[it].p.getEntry(0).toFloat(),
+                boids[it].p.getEntry(1).toFloat()
+            )
         })
     }
 }

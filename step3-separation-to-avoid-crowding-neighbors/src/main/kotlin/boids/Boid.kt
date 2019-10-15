@@ -1,67 +1,78 @@
 package boids
 
-import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.factory.Nd4j
+import kotlin.math.*
+import org.apache.commons.math3.linear.RealVector
+import org.apache.commons.math3.linear.ArrayRealVector
 
-class Boid(
-        var p: INDArray,
-        var v: INDArray,
-        val rangeMin: DoubleArray,
-        val rangeMax: DoubleArray
+public class Boid(
+    var p: RealVector,
+    var v: RealVector,
+    val rangeMin: DoubleArray,
+    val rangeMax: DoubleArray,
+    val vMax: Double,
+    val cCoh: Double,
+    val cAlg: Double,
+    val cSep: Double
     ) {
     var neighbors = arrayOf(this)
-    var vNext = Nd4j.zeros(2);
-    val cCoh = 0.1
-    val cAlg = 0.5
-    val cSep = 0.00045
+    var vNext = ArrayRealVector()
 
     fun observe(boids: Array<Boid>) {
         neighbors = boids
     }
 
-    fun decide(pAve: INDArray, vAve: INDArray) {
-        val aCoh = pAve.sub(p)
-        val aAlg = vAve.sub(v)
-        var aSep = Nd4j.zeros(2)
-    
+    fun decide(pAve: RealVector, vAve: RealVector) {
+        var aCoh = pAve.subtract(p)
+        var aAlg = vAve.subtract(v)
+        var aSep = ArrayRealVector(2)
+        
         for(neighbor in neighbors) {
             if(neighbor != this){
-                val u = p.sub(neighbor.p)
-                //val d = u.norm2Number()
-                aSep.addi(u/*.div(d)*/)
-                //println(e)
+                val dir = p.subtract(neighbor.p)
+                val nrm = dir.getNorm()
+                val sep = dir.unitVector().mapDivide(nrm)
+                aSep = aSep.add(sep)
             }
         }
 
-        var a = Nd4j.zeros(2)
-        a.add(aCoh.mul(cCoh))
-        a.add(aAlg.mul(cAlg))
-        a.add(aSep.mul(cSep))
-        
-        val vNext = v.add(a)
+        /*
+        aCoh = aCoh.mapMultiply(cCoh)
+        aAlg = aAlg.mapMultiply(cAlg)
+        aSep = aSep.mapMultiply(cSep)
+        */
+        aCoh = aCoh.mapMultiply(cCoh)
+        aAlg = aAlg.mapMultiply(cAlg)
+        aSep.mapMultiplyToSelf(cSep)
+        var a = ArrayRealVector(2)
+        a = a.add(aCoh)
+        a = a.add(aAlg)
+        a = a.add(aSep)
 
-        //constriction the velocity
-        val vMax: Number = 5.0
-        //val vNorm = v.norm2Number()
-        this.vNext = vNext//.div(vNorm).mul(vMax)
+        val vMax = 2.0
+        var vNext = a.add(v)
+        fixV(vNext, vMax)
+        this.vNext = vNext
     }
 
     fun act() {
         v = vNext
         p = p.add(vNext)
-        fix()
+        fixP(p)
     }
 
-    private fun fix() {
+    private fun fixV(v: RealVector, vMax: Double) = v.mapMultiplyToSelf(min(vMax/v.getNorm(), 1.0))
+    
+    private fun fixP(p: RealVector) {
         for(d in 0..1) {
-            if(p.getDouble(d) <= rangeMin[d]) {
-               p.putScalar(d, rangeMin[d])
-               v.putScalar(d, -v.getDouble(d))
+            if(p.getEntry(d) < rangeMin[d]) {
+               p.setEntry(d, rangeMin[d])
+               v.setEntry(d, -v.getEntry(d))
             }
-            if(p.getDouble(d) >= rangeMax[d]) {
-               p.putScalar(d, rangeMax[d])
-               v.putScalar(d, -v.getDouble(d))
+            if(p.getEntry(d) > rangeMax[d]) {
+               p.setEntry(d, rangeMax[d])
+               v.setEntry(d, -v.getEntry(d))
             }
         }
     }
+
 }
