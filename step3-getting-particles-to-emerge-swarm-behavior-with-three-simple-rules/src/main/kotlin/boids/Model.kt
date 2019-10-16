@@ -28,19 +28,19 @@ class Model(var N: Int) {
             boid.observe(boids)
         }
         
-        var pAve = ArrayRealVector(2)
-        var vAve = ArrayRealVector(2)
+        var pG = ArrayRealVector(2)
+        var vG = ArrayRealVector(2)
 
         for(boid in boids) {
-            pAve = pAve.add(boid.p)
-            pAve = pAve.add(boid.v)
+            pG = pG.add(boid.p)
+            vG = vG.add(boid.v)
         }
-        pAve.mapDivideToSelf(boids.size.toDouble())
-        vAve.mapDivideToSelf(boids.size.toDouble())
+        pG.mapDivideToSelf(boids.size.toDouble())
+        vG.mapDivideToSelf(boids.size.toDouble())
 
         //decision phase
         for(boid in boids) {
-            boid.decide(pAve = pAve, vAve = vAve)
+            boid.decide(pG = pG, vG = vG)
         }
 
         //action phase

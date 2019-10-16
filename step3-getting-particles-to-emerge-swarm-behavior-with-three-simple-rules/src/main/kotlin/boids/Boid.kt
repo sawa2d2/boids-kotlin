@@ -21,9 +21,9 @@ public class Boid(
         neighbors = boids
     }
 
-    fun decide(pAve: RealVector, vAve: RealVector) {
-        var aCoh = pAve.subtract(p)
-        var aAlg = vAve.subtract(v)
+    fun decide(pG: RealVector, vG: RealVector) {
+        var aCoh = pG.subtract(p)
+        var aAlg = vG.subtract(v)
         var aSep = ArrayRealVector(2)
         
         for(neighbor in neighbors) {
