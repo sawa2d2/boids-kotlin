@@ -38,8 +38,7 @@ public class Boid(
         }
     }
 
-    private fun isInScope(distance: Double, cosine: Double): Boolean
-        = (distance <= dis && cos(fov/2) <= cosine && cosine <= 1.0)
+    private fun isInScope(distance: Double, cosine: Double) = (distance <= dis && cos(fov/2) <= cosine && cosine <= 1.0)
 
     fun decide(pG: RealVector, vG: RealVector) {
         var aCoh = pG.subtract(p)
