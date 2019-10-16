@@ -1,36 +1,44 @@
 package boids
 
-import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.factory.Nd4j
+import kotlin.math.*
+import kotlin.random.*
+import org.apache.commons.math3.linear.RealVector
+import org.apache.commons.math3.linear.ArrayRealVector
 
-class Boid(var p: INDArray, var v: INDArray, val rangeMin: INDArray, val rangeMax: INDArray) {
+public class Boid(
+    var p: RealVector,
+    var v: RealVector,
+    val rangeMin: DoubleArray,
+    val rangeMax: DoubleArray
+    ) {
     fun act() {
         p = p.add(v)
-        fix()
+        fixP(p)
     }
 
-    fun fix() {
+    fun fixP(p: RealVector) {
         for(d in 0..1) {
-            if(p.getDouble(d) <= rangeMin.getDouble(d)) {
-               p.putScalar(d, rangeMin.getDouble(d))
-               v.putScalar(d, -v.getDouble(d))
+            if(p.getEntry(d) < rangeMin[d]) {
+               p.setEntry(d, rangeMin[d])
+               v.setEntry(d, -v.getEntry(d))
             }
-            if(p.getDouble(d) >= rangeMax.getDouble(d)) {
-               p.putScalar(d, rangeMax.getDouble(d))
-               v.putScalar(d, -v.getDouble(d))
+            if(p.getEntry(d) > rangeMax[d]) {
+               p.setEntry(d, rangeMax[d])
+               v.setEntry(d, -v.getEntry(d))
             }
         }
     }
 }
 
 class Boids() {
-    val rangeMin = Nd4j.create(doubleArrayOf(0.0, 0.0))
-    val rangeMax = Nd4j.create(doubleArrayOf(600.0, 600.0))
+    val rangeMin = doubleArrayOf(0.0, 0.0)
+    val rangeMax = doubleArrayOf(600.0, 600.0)
+    val vMax = 2.5
 
     val boids = Array(100, {
         Boid(
-            p = Nd4j.rand(2, 1).mul(600.0),
-            v = Nd4j.rand(2, 1).sub(0.5).mul(5 * 2.0),
+            p = ArrayRealVector(doubleArrayOf(Random.nextDouble(600.0), Random.nextDouble(600.0))),
+            v = ArrayRealVector(doubleArrayOf(Random.nextDouble(2 * vMax) - vMax, Random.nextDouble(2 * vMax) - vMax)),
             rangeMin = rangeMin,
             rangeMax = rangeMax
         )
@@ -42,9 +50,13 @@ class Boids() {
         }
     }
 
+
     fun getData(): Array<FloatArray> {
         return Array<FloatArray>(boids.size, {
-            floatArrayOf(boids[it].p.getFloat(0), boids[it].p.getFloat(1))
+            floatArrayOf(
+                boids[it].p.getEntry(0).toFloat(),
+                boids[it].p.getEntry(1).toFloat()
+            )
         })
     }
 }
