@@ -3,7 +3,7 @@ import boids.*
 
 class Main : PApplet () {
     var d = 40F // diameter
-    var model = Boids()
+    var model = Model()
 
     override fun settings() {
         size(200, 200)
@@ -16,7 +16,7 @@ class Main : PApplet () {
         model.run()
     }
  
-    fun run(args: Array<String>) : Unit = PApplet.main("Main")
+    fun run() : Unit = PApplet.main("Main")
 }
 
-fun main(args : Array<String>) : Unit = Main().run(args)
+fun main(args : Array<String>) : Unit = Main().run()

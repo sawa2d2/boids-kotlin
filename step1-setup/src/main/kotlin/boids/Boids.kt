@@ -1,25 +1,30 @@
 package boids
 
-import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.factory.Nd4j
+import kotlin.math.*
+import kotlin.random.*
+import org.apache.commons.math3.linear.RealVector
+import org.apache.commons.math3.linear.ArrayRealVector
 
-class Boid(var p: INDArray, var v: INDArray) {
+class Boid(var p: RealVector, var v: RealVector) {
     fun act() {
         p = p.add(v)
-        if(p.getDouble(0) >= 200) {
-            p.putScalar(0, 0)
+        if(p.getEntry(0) >= 200.0) {
+            p.setEntry(0, 0.0)
         }
     }
 }
 
-class Boids() {
-    var boid = Boid(Nd4j.create(doubleArrayOf(0.0, 100.0)), Nd4j.create(doubleArrayOf(1.0, 0.0)))
+class Model() {
+    var boid = Boid(ArrayRealVector(doubleArrayOf(0.0, 100.0)), ArrayRealVector(doubleArrayOf(1.0, 0.0)))
 
     fun run() {
         boid.act()
     }
 
-    fun getData(): FloatArray {
-        return floatArrayOf(boid.p.getFloat(0), boid.p.getFloat(1))
+   fun getData(): FloatArray {
+        return floatArrayOf(
+            boid.p.getEntry(0).toFloat(),
+            boid.p.getEntry(1).toFloat()
+        )
     }
 }
